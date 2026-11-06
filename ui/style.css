@@ -23,6 +23,7 @@ body {
 h1 { font-size: 44px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; }
 .muted { color: var(--ink-3); }
 code { color: var(--ink-2); }
+.examples-link { color: var(--accent); font-size: 18px; }
 .status { margin-top: auto; color: var(--ink-2); }
 .status.off { color: #fcd34d; }
 .buttons { display: grid; gap: 12px; }

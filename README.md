@@ -19,6 +19,7 @@ This starter takes over the Edge's touch panel while it's running, reads the tou
 - **Stays there.** If the window gets moved off the Edge, or you unplug and replug it, it moves back. Touch also picks back up after a replug, and works even if you plug the Edge in after starting the app.
 - **Lives in the menu bar.** No Dock icon. It waits for the Edge, opens fullscreen on it when you plug it in, and hides when you unplug. The menu has a status line, Show on Edge, Open at login and Quit. Open at login turns on the first time it runs (set `OPEN_AT_LOGIN_BY_DEFAULT` in `src-tauri/src/tray.rs` to change that).
 - **A demo page** in `ui/` (buttons, a text field, a scrolling list, a live touch readout) to replace with your own UI.
+- **Examples** you can keep or delete: now playing with a Spotify like button, weather, Apple Reminders, Apple Photos and system stats (see Examples below).
 - **A log** at `~/Library/Logs/edge-starter.log` that says exactly what happened with touch.
 
 Built with [Tauri 2](https://tauri.app) (Rust) and a plain HTML/CSS/JS page. No web framework required, but you can drop one in.
@@ -68,6 +69,27 @@ Your UI lives in `ui/`. It's an ordinary web page:
 - Call Rust from the page with `window.__TAURI__.core.invoke("command_name")`. Add commands in `src-tauri/src/lib.rs`.
 
 Tips for the Edge's 2560 x 720 screen: keep touch targets at least 44 px, skip hover-only controls (fingers can't hover), and test at exactly 2560 x 720.
+
+## Examples
+
+Open **ui/examples.html** (there's a link on the demo page) for five working examples, each a card in `ui/examples/` and a Rust module in `src-tauri/src/examples/`. Keep the ones you want, delete the rest (see the top of `src-tauri/src/examples/mod.rs`).
+
+| Example | What it shows | Setup |
+| --- | --- | --- |
+| Now playing | Spotify or Apple Music: track, artwork, play/pause, next, previous. Spotify songs get a like button. | macOS asks once per player (Automation). For the like button, see Spotify below. |
+| Weather | Now, feels like, high and low, the next hours. From [Open-Meteo](https://open-meteo.com) (free, no key). | Set `LAT` / `LON` in `src-tauri/src/examples/weather.rs`. |
+| Reminders | Open reminders from every list, check off, add to your default list (EventKit). | Tap "Show my Reminders"; macOS asks once. |
+| Photos | A random Favorite from Apple Photos every 30 seconds with a fade. Tap for the date and a heart to (un)favorite it (PhotoKit). Photos never opens. | Tap "Show my photos"; macOS asks once. |
+| This Mac | CPU, memory and network, sampled every 2 seconds. | None. |
+
+The permission prompts need matching keys in `src-tauri/Info.plist` and `src-tauri/Entitlements.plist` (hardened runtime). Remove the keys for examples you delete.
+
+**Spotify likes.** Spotify's Mac app can't like songs from AppleScript, so this uses the Spotify Web API with PKCE sign-in (no client secret).
+
+1. Create an app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) with the Web API.
+2. Add the redirect URI `http://127.0.0.1:4848/callback`.
+3. Build with its Client ID: `SPOTIFY_CLIENT_ID=your-client-id npm run build`.
+4. Tap "Connect Spotify" on the card and sign in. The app listens on port 4848 only while a sign-in is in progress. Your sign-in is saved in `~/Library/Application Support/edge-starter/spotify-token`, readable only by you.
 
 ## How the touch takeover works (and what bit us)
 

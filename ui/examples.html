@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edge Starter examples</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="examples/examples.css" />
+</head>
+<body>
+  <!-- Five examples side by side. Each card is one file in examples/ and one
+       Rust module in src-tauri/src/examples/. Keep what you like. -->
+  <main class="ex-grid">
+    <section class="col" id="now-playing"><p class="label">Now playing</p><div class="body"></div></section>
+    <section class="col" id="weather"><p class="label">Weather</p><div class="body"></div></section>
+    <section class="col" id="reminders"><p class="label">Reminders</p><div class="body"></div></section>
+    <section class="col photo-col" id="photo"><div class="body"></div></section>
+    <section class="col" id="system"><p class="label">This Mac</p><div class="body"></div></section>
+  </main>
+  <a class="back" href="index.html">Back to the demo</a>
+  <script src="touch.js"></script>
+  <script src="examples/util.js"></script>
+  <script src="examples/now-playing.js"></script>
+  <script src="examples/weather.js"></script>
+  <script src="examples/reminders.js"></script>
+  <script src="examples/photo.js"></script>
+  <script src="examples/system.js"></script>
+</body>
+</html>

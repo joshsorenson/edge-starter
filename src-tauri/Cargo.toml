@@ -19,11 +19,24 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
 dirs = "6"
+# Examples (src/examples): HTTP for Spotify + weather, PKCE, system stats.
+ureq = { version = "3", features = ["json"] }
+url = "2"
+sha2 = "0.10"
+base64 = "0.22"
+uuid = { version = "1", features = ["v4"] }
+sysinfo = { version = "0.37", default-features = false, features = ["system", "network"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 core-graphics = "0.25"
 core-foundation = "0.10"
 objc2 = "0.6"
+# Examples: Reminders (EventKit) and Photos (PhotoKit).
+block2 = "0.6"
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSArray", "NSData", "NSDate", "NSDictionary", "NSError", "NSPredicate", "NSSortDescriptor", "NSString", "NSCalendar"] }
+objc2-event-kit = { version = "0.3", default-features = false, features = ["std", "block2", "EKCalendar", "EKCalendarItem", "EKEventStore", "EKObject", "EKReminder", "EKTypes"] }
+objc2-photos = { version = "0.3", default-features = false, features = ["std", "block2", "PHAsset", "PHObject", "PHFetchResult", "PHFetchOptions", "PHImageManager", "PHPhotoLibrary", "PhotosTypes", "objc2-image-io", "PHAssetChangeRequest", "PHChangeRequest", "dispatch2"] }
+objc2-image-io = { version = "0.3", default-features = false, features = ["std"] }
 
 [profile.release]
 codegen-units = 1

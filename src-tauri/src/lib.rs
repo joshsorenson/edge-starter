@@ -13,6 +13,7 @@
 //!
 //! Your UI lives in `ui/`. Start there.
 
+mod examples;
 mod touch;
 mod tray;
 
@@ -122,9 +123,31 @@ fn touch_status() -> touch::TouchStatus {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
-        .invoke_handler(tauri::generate_handler![focus_window, touch_status])
+        .invoke_handler(tauri::generate_handler![
+            focus_window,
+            touch_status,
+            // Examples (src/examples): delete the ones you don't want.
+            examples::now_playing,
+            examples::media_control,
+            examples::spotify_status,
+            examples::spotify_login,
+            examples::spotify_liked,
+            examples::spotify_set_liked,
+            examples::reminders_list,
+            examples::reminders_request_access,
+            examples::reminder_set_completed,
+            examples::reminder_add,
+            examples::photos_random,
+            examples::photos_request_access,
+            examples::photo_set_favorite,
+            examples::weather,
+            examples::system_snapshot,
+        ])
         .setup(|app| {
             let _ = APP.set(app.handle().clone());
+
+            // Example: start sampling CPU / memory / network for system_snapshot.
+            examples::system::start();
 
             // Menu bar app: no Dock icon, waits for the Edge. Remove these
             // lines if you'd rather have a regular Dock app.

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Permission prompts for the examples in src/examples. Remove the ones you don't use. -->
+  <key>NSAppleEventsUsageDescription</key>
+  <string>Edge Starter shows and controls what's playing in Spotify or Music.</string>
+  <key>NSRemindersFullAccessUsageDescription</key>
+  <string>Edge Starter shows and checks off your reminders.</string>
+  <key>NSRemindersUsageDescription</key>
+  <string>Edge Starter shows and checks off your reminders.</string>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>Edge Starter shows photos from your library.</string>
+</dict>
+</plist>
