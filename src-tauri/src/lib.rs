@@ -8,10 +8,13 @@
 //!    as `window.__edgeTouch("down" | "move" | "up", x, y)`.
 //! 3. Puts the window back on the Edge if it's knocked out of fullscreen, and
 //!    follows the Edge when it's unplugged and plugged back in.
+//! 4. Lives in the menu bar (no Dock icon): waits for the Edge, shows itself on
+//!    it, hides when it's unplugged, and can open at login (see tray.rs).
 //!
 //! Your UI lives in `ui/`. Start there.
 
 mod touch;
+mod tray;
 
 use std::{path::PathBuf, sync::OnceLock, time::Duration};
 use tauri::{LogicalPosition, LogicalSize, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
@@ -35,7 +38,8 @@ pub(crate) fn log(msg: &str) {
     }
 }
 
-/// Put the window on the Edge, fullscreen. Without the Edge, a normal window.
+/// Put the window on the Edge, fullscreen. Without the Edge, hide it: the app
+/// waits in the menu bar until the Edge is plugged in.
 ///
 /// Uses macOS point coordinates (`touch::edge_rect`). Physical pixels go wrong
 /// with mixed scaling: a 2x main display would halve the Edge's position and
@@ -44,6 +48,7 @@ fn place(win: &WebviewWindow, edge: Option<touch::Rect>) {
     let _ = win.set_fullscreen(false);
     match edge {
         Some(r) => {
+            let _ = win.show();
             let _ = win.set_position(LogicalPosition::new(r.x, r.y));
             let _ = win.set_size(LogicalSize::new(r.w, r.h));
             // Let macOS register the move before going fullscreen on that screen.
@@ -51,9 +56,15 @@ fn place(win: &WebviewWindow, edge: Option<touch::Rect>) {
             let _ = win.set_fullscreen(true);
         }
         None => {
-            let _ = win.set_size(LogicalSize::new(1280.0, 360.0));
-            let _ = win.center();
+            let _ = win.hide();
         }
+    }
+}
+
+/// "Show on Edge" in the menu bar: put the window back on the Edge.
+pub(crate) fn show_on_edge(app: &tauri::AppHandle) {
+    if let Some(win) = app.get_webview_window("main") {
+        place(&win, touch::edge_rect());
     }
 }
 
@@ -75,9 +86,19 @@ fn touch_status() -> touch::TouchStatus {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
         .invoke_handler(tauri::generate_handler![focus_window, touch_status])
         .setup(|app| {
             let _ = APP.set(app.handle().clone());
+
+            // Menu bar app: no Dock icon, waits for the Edge. Remove these
+            // lines if you'd rather have a regular Dock app.
+            #[cfg(target_os = "macos")]
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            if tray::OPEN_AT_LOGIN_BY_DEFAULT {
+                tray::default_open_at_login(app.handle());
+            }
+            tray::build(app.handle())?;
 
             // Touches go straight into the page. The mouse never moves.
             let handle = app.handle().clone();
@@ -99,10 +120,10 @@ pub fn run() {
                 .build()?;
             let edge = touch::edge_rect();
             if edge.is_none() {
-                log("window: no Edge-shaped display found; opening a normal window");
+                log("window: Edge not connected; waiting in the menu bar");
             }
             place(&win, edge);
-            win.show()?;
+            tray::set_status(if edge.is_some() { "On the Edge" } else { "Waiting for the Edge" });
 
             // Follow the Edge when it's plugged in, unplugged or rearranged, and
             // put the window back fullscreen if something knocked it out.
@@ -115,6 +136,10 @@ pub fn run() {
                     let now = touch::edge_rect();
                     let knocked_out = now.is_some() && !win.is_fullscreen().unwrap_or(true);
                     if now != last || knocked_out {
+                        if now != last {
+                            log(if now.is_some() { "window: Edge connected; showing" } else { "window: Edge unplugged; hiding" });
+                            tray::set_status(if now.is_some() { "On the Edge" } else { "Waiting for the Edge" });
+                        }
                         let _ = handle.run_on_main_thread(move || place(&win, now));
                         last = now;
                     }

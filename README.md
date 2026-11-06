@@ -15,6 +15,7 @@ This starter takes over the Edge's touch panel while it's running, reads the tou
 - **Touch on the Edge.** Taps become normal clicks, drags scroll, tapping a text field focuses it so you can type. Raw touches are available too.
 - **Opens fullscreen on the Edge**, even with a Retina main display at 2x and the Edge at 1x (window placement with physical pixels gets this wrong).
 - **Stays there.** If the window gets knocked out of fullscreen, or you unplug and replug the Edge, it moves back. Touch also picks back up after a replug, and works even if you plug the Edge in after starting the app.
+- **Lives in the menu bar.** No Dock icon. It waits for the Edge, opens fullscreen on it when you plug it in, and hides when you unplug. The menu has a status line, Show on Edge, Open at login and Quit. Open at login turns on the first time it runs (set `OPEN_AT_LOGIN_BY_DEFAULT` in `src-tauri/src/tray.rs` to change that).
 - **A demo page** in `ui/` (buttons, a text field, a scrolling list, a live touch readout) to replace with your own UI.
 - **A log** at `~/Library/Logs/edge-starter.log` that says exactly what happened with touch.
 
@@ -42,7 +43,7 @@ APPLE_SIGNING_IDENTITY="Apple Development: Your Name (XXXXXXXXXX)" npm run build
 
 Or set `bundle.macOS.signingIdentity` in `src-tauri/tauri.conf.json` so you don't have to pass it each time.
 
-**2. Run it.** The app is in `src-tauri/target/release/bundle/macos/Edge Starter.app`. Drag it to Applications and open it.
+**2. Run it.** The app is in `src-tauri/target/release/bundle/macos/Edge Starter.app`. Drag it to Applications and open it. Look for its icon in the menu bar; there's no Dock icon.
 
 **3. Allow Input Monitoring.** macOS asks the first time. If it doesn't, go to System Settings > Privacy & Security > Input Monitoring and turn on Edge Starter. Touch turns on within a few seconds, no restart needed.
 
@@ -94,7 +95,7 @@ tail -20 ~/Library/Logs/edge-starter.log
 | `seize interface 0x1/0x2 -> IOReturn 0xe00002e2` | Input Monitoring isn't in effect. Allow it (and reset the old record, above). |
 | `Edge touchscreen not found ... still looking` | The Edge isn't connected (or the USB-C cable only carries power). Touch turns on by itself once it's plugged in. |
 | `took over every Edge touch interface` | Touch is working. |
-| `no Edge-shaped display found` | The Edge isn't connected as a display, so the app opened a normal window. |
+| `Edge not connected; waiting in the menu bar` | The Edge isn't connected as a display. The window appears on its own once it is. |
 
 ## License
 
