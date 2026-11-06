@@ -177,10 +177,11 @@ pub fn login() -> Result<(), String> {
     Err("Sign-in timed out".into())
 }
 
-/// Is this track in your Liked Songs?
+/// Is this track in your Liked Songs? Uses `/me/library/contains`: Spotify
+/// removed `/me/tracks` for development-mode apps in February 2026.
 pub fn is_liked(id: &str) -> Result<bool, String> {
     let token = access_token()?;
-    let mut res = ureq::get(&format!("https://api.spotify.com/v1/me/tracks/contains?ids={id}"))
+    let mut res = ureq::get(&format!("https://api.spotify.com/v1/me/library/contains?uris=spotify:track:{id}"))
         .header("Authorization", &format!("Bearer {token}"))
         .call()
         .map_err(|e| e.to_string())?;
@@ -191,7 +192,7 @@ pub fn is_liked(id: &str) -> Result<bool, String> {
 /// Like (save to Liked Songs) or unlike a track.
 pub fn set_liked(id: &str, liked: bool) -> Result<(), String> {
     let token = access_token()?;
-    let url = format!("https://api.spotify.com/v1/me/tracks?ids={id}");
+    let url = format!("https://api.spotify.com/v1/me/library?uris=spotify:track:{id}");
     let auth = format!("Bearer {token}");
     let res = if liked { ureq::put(&url).header("Authorization", &auth).send_empty() } else { ureq::delete(&url).header("Authorization", &auth).call() };
     res.map(|_| ()).map_err(|e| e.to_string())
