@@ -4,6 +4,8 @@ A starting point for building your own app on the **Corsair XENEON Edge** on mac
 
 **Tested on macOS 27.2 (Apple silicon), with the Edge connected to the Mac over USB-C** (one cable carries both the display and touch).
 
+This came out of [Edge Deck](https://joshsorenson.com/apps/edge-deck), the dashboard I built for my own Edge.
+
 ## The problem this solves
 
 On a Mac, the Edge's touch panel shows up as a regular USB touchscreen, and macOS maps every touch onto your **main** display. Tap the Edge and you click whatever is in the same spot on your other monitor.
