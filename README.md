@@ -15,8 +15,8 @@ This starter takes over the Edge's touch panel while it's running, reads the tou
 ## What you get
 
 - **Touch on the Edge.** Taps become normal clicks, drags scroll, tapping a text field focuses it so you can type. Raw touches are available too.
-- **Opens fullscreen on the Edge**, even with a Retina main display at 2x and the Edge at 1x (window placement with physical pixels gets this wrong).
-- **Stays there.** If the window gets knocked out of fullscreen, or you unplug and replug the Edge, it moves back. Touch also picks back up after a replug, and works even if you plug the Edge in after starting the app.
+- **Covers the Edge edge to edge**, even with a Retina main display at 2x and the Edge at 1x (window placement with physical pixels gets this wrong). It pins a borderless window over the Edge, above its menu bar, instead of using macOS native fullscreen, which a menu bar app can't hold reliably.
+- **Stays there.** If the window gets moved off the Edge, or you unplug and replug it, it moves back. Touch also picks back up after a replug, and works even if you plug the Edge in after starting the app.
 - **Lives in the menu bar.** No Dock icon. It waits for the Edge, opens fullscreen on it when you plug it in, and hides when you unplug. The menu has a status line, Show on Edge, Open at login and Quit. Open at login turns on the first time it runs (set `OPEN_AT_LOGIN_BY_DEFAULT` in `src-tauri/src/tray.rs` to change that).
 - **A demo page** in `ui/` (buttons, a text field, a scrolling list, a live touch readout) to replace with your own UI.
 - **A log** at `~/Library/Logs/edge-starter.log` that says exactly what happened with touch.

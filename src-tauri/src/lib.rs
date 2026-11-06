@@ -1,12 +1,12 @@
 //! Edge Starter: a minimal app for the Corsair XENEON Edge on macOS.
 //!
 //! What it does for you:
-//! 1. Finds the Edge (the ~32:9 display) and opens a fullscreen window on it,
+//! 1. Finds the Edge (the ~32:9 display) and pins a borderless window over it,
 //!    even with a Retina main display at 2x and the Edge at 1x.
 //! 2. Takes over the Edge's touchscreen so touches land in this window instead
 //!    of clicking your main display (see touch.rs), and hands them to the page
 //!    as `window.__edgeTouch("down" | "move" | "up", x, y)`.
-//! 3. Puts the window back on the Edge if it's knocked out of fullscreen, and
+//! 3. Puts the window back on the Edge if it's moved off it, and
 //!    follows the Edge when it's unplugged and plugged back in.
 //! 4. Lives in the menu bar (no Dock icon): waits for the Edge, shows itself on
 //!    it, hides when it's unplugged, and can open at login (see tray.rs).
@@ -38,25 +38,60 @@ pub(crate) fn log(msg: &str) {
     }
 }
 
-/// Put the window on the Edge, fullscreen. Without the Edge, hide it: the app
-/// waits in the menu bar until the Edge is plugged in.
+/// Put the window over the Edge, edge to edge. Without the Edge, hide it: the
+/// app waits in the menu bar until the Edge is plugged in.
 ///
-/// Uses macOS point coordinates (`touch::edge_rect`). Physical pixels go wrong
-/// with mixed scaling: a 2x main display would halve the Edge's position and
-/// land the window on the main display.
+/// This doesn't use macOS native fullscreen (its own Space): a menu bar app
+/// can't hold it reliably, which leaves the window half-placed and touches
+/// landing in the wrong spot. Instead the borderless window is pinned over
+/// the Edge's exact bounds, above that display's menu bar, on every Space.
+///
+/// Positions use macOS point coordinates (`touch::edge_rect`). Physical
+/// pixels go wrong with a 2x main display and the 1x Edge.
 fn place(win: &WebviewWindow, edge: Option<touch::Rect>) {
     let _ = win.set_fullscreen(false);
     match edge {
         Some(r) => {
-            let _ = win.show();
+            pin_above_menu_bar(win);
             let _ = win.set_position(LogicalPosition::new(r.x, r.y));
             let _ = win.set_size(LogicalSize::new(r.w, r.h));
-            // Let macOS register the move before going fullscreen on that screen.
-            std::thread::sleep(Duration::from_millis(150));
-            let _ = win.set_fullscreen(true);
+            let _ = win.show();
+            log(&format!("window: pinned over the Edge at {},{} {}x{}", r.x, r.y, r.w, r.h));
         }
         None => {
             let _ = win.hide();
+        }
+    }
+}
+
+/// Is the window visible and covering exactly the Edge's bounds?
+fn on_edge(win: &WebviewWindow, r: touch::Rect) -> bool {
+    let sf = win.scale_factor().unwrap_or(1.0);
+    let (Ok(p), Ok(sz)) = (win.outer_position(), win.outer_size()) else { return false };
+    let near = |a: f64, b: f64| (a - b).abs() < 2.0;
+    win.is_visible().unwrap_or(false)
+        && near(p.x as f64 / sf, r.x)
+        && near(p.y as f64 / sf, r.y)
+        && near(sz.width as f64 / sf, r.w)
+        && near(sz.height as f64 / sf, r.h)
+}
+
+/// Window level above the menu bar (so it covers the Edge's own menu bar),
+/// shown on every Space, left alone by Mission Control.
+fn pin_above_menu_bar(win: &WebviewWindow) {
+    #[cfg(target_os = "macos")]
+    if let Ok(ptr) = win.ns_window() {
+        use objc2::msg_send;
+        use objc2::runtime::AnyObject;
+        // NSMainMenuWindowLevel is 24; one above it covers the menu bar.
+        const LEVEL: isize = 25;
+        // canJoinAllSpaces | stationary | fullScreenAuxiliary
+        const BEHAVIOR: usize = (1 << 0) | (1 << 4) | (1 << 8);
+        unsafe {
+            let ns: &AnyObject = &*(ptr as *const AnyObject);
+            let _: () = msg_send![ns, setLevel: LEVEL];
+            let _: () = msg_send![ns, setCollectionBehavior: BEHAVIOR];
+            let _: () = msg_send![ns, setHasShadow: false];
         }
     }
 }
@@ -134,7 +169,7 @@ pub fn run() {
                     std::thread::sleep(Duration::from_secs(3));
                     let Some(win) = handle.get_webview_window("main") else { break };
                     let now = touch::edge_rect();
-                    let knocked_out = now.is_some() && !win.is_fullscreen().unwrap_or(true);
+                    let knocked_out = now.is_some_and(|r| !on_edge(&win, r));
                     if now != last || knocked_out {
                         if now != last {
                             log(if now.is_some() { "window: Edge connected; showing" } else { "window: Edge unplugged; hiding" });
