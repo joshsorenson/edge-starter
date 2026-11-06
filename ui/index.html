@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edge Starter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- A demo of everything touch can do on the Edge. Replace it with your UI. -->
+  <main class="grid">
+    <section class="col intro">
+      <p class="label">Edge Starter</p>
+      <h1>Touch works.<br />Build something.</h1>
+      <p class="muted">Edit <code>ui/</code> to make this yours.</p>
+      <p class="status" id="touch-status">Checking touch…</p>
+    </section>
+
+    <section class="col">
+      <p class="label">Tap</p>
+      <div class="buttons">
+        <button id="count-btn" class="big">Tapped <span id="count">0</span></button>
+        <button id="accent-btn" class="big ghost">Change color</button>
+      </div>
+      <p class="label">Type</p>
+      <input id="text" placeholder="Tap here, then type on your keyboard" />
+    </section>
+
+    <section class="col">
+      <p class="label">Drag to scroll</p>
+      <ul class="list" id="list"></ul>
+    </section>
+
+    <section class="col">
+      <p class="label">Last touch</p>
+      <p class="readout" id="last-touch">–</p>
+      <p class="muted">Position in Edge pixels (2560 × 720).</p>
+    </section>
+  </main>
+  <script src="touch.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

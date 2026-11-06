@@ -1,0 +1,46 @@
+/* Minimal dark theme sized for the 2560x720 Edge. */
+:root {
+  --bg: #000;
+  --ink: #f4f4f2;
+  --ink-2: rgb(244 244 242 / 0.6);
+  --ink-3: rgb(244 244 242 / 0.35);
+  --line: rgb(255 255 255 / 0.09);
+  --accent: #a394ff;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--ink); overflow: hidden; }
+body {
+  font: 18px/1.4 ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-user-select: none; user-select: none;
+  /* Touch: no grey tap flash, no long-press callout. */
+  -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;
+}
+.grid { display: grid; grid-template-columns: 1.1fr 1fr 1fr 0.8fr; height: 100%; }
+.col { display: flex; flex-direction: column; gap: 16px; min-height: 0; padding: 32px; border-left: 1px solid var(--line); }
+.col:first-child { border-left: 0; }
+.label { font-size: 13px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+h1 { font-size: 44px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; }
+.muted { color: var(--ink-3); }
+code { color: var(--ink-2); }
+.status { margin-top: auto; color: var(--ink-2); }
+.status.off { color: #fcd34d; }
+.buttons { display: grid; gap: 12px; }
+button.big {
+  height: 72px; border: 0; border-radius: 999px; background: var(--accent); color: #000;
+  font: inherit; font-size: 20px; font-weight: 600; cursor: pointer;
+  transition: transform 80ms ease, opacity 80ms ease;
+}
+button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+input {
+  height: 56px; border: 0; border-bottom: 1px solid var(--line); background: transparent;
+  color: var(--ink); font: inherit; font-size: 19px; outline: none;
+  -webkit-user-select: text; user-select: text;
+}
+input:focus { border-bottom-color: var(--ink-3); }
+.list { list-style: none; padding: 0; overflow-y: auto; min-height: 0; flex: 1; scrollbar-width: none; }
+.list li { padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 19px; }
+.readout { font-size: 44px; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* Press feedback while a finger is down (set by touch.js). */
+.edge-pressed { transform: scale(0.97); opacity: 0.8; }
+@media (prefers-reduced-motion: reduce) { button.big { transition: none; } }

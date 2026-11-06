@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Lets the page call focus_window and touch_status.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}
